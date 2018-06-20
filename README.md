@@ -1,6 +1,9 @@
 #basic HTML5 video player test's
 - basic video player that can play a locally hosted video file.
 
+run npm install to install dependencies
+run npm start to start the server
+
 - custom controls
   - change video player size.
   - remove download option.
