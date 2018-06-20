@@ -36,13 +36,18 @@ class VideoPlayer extends React.Component { // MyCoolApp is the name of the app
 
   handleChange(event) {
     this.setState({value: event.target.value});
-    let path = event.target.value;
-    console.log(path);
-    // videoInfo(value);
+    // let path = event.target.value;
+    // console.log('Handle Change:', path);
+    let fileName = event.target.files[0].name;
+    console.log('file name:', fileName);
+    let tmppath = URL.createObjectURL(event.target.files[0]);
+    console.log('temp path:', tmppath);
+
+    this.createVideo(tmppath, fileName);
   }
 
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.value);
+    alert('file selected: ' + this.state.value);
     event.preventDefault();
   }
 
