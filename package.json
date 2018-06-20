@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "watch": "webpack-dev-server --inline --hot --history-api-fallback --open",
+    "hot": "webpack-dev-server --inline --hot",
+    "start": "webpack && nodemon index.js --ignore dist"
   },
   "repository": {
     "type": "git",
@@ -16,5 +20,23 @@
   "bugs": {
     "url": "https://github.com/dambergn/video-player/issues"
   },
-  "homepage": "https://github.com/dambergn/video-player#readme"
+  "homepage": "https://github.com/dambergn/video-player#readme",
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.11",
+    "express": "^4.16.3",
+    "html-webpack-plugin": "^3.2.0",
+    "node-sass": "^4.9.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-router-dom": "^4.3.1",
+    "sass-loader": "^7.0.3",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.12.0",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "^3.1.4"
+  }
 }
