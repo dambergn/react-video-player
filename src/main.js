@@ -9,15 +9,17 @@ class VideoPlayer extends React.Component {
     super(props);
     this.state = {
       movieFileName: '',
-      moviePath: ''
+      moviePath: '',
+      isPlaying: false,
     }
     this.handleChange = this.handleChange.bind(this);
     this.movieInfo = this.movieInfo.bind(this);
     this.setBackground = this.setBackground.bind(this);
     this.setPoster = this.setPoster.bind(this);
-    this.videoConstructor = this.videoConstructor.bind(this);
-    this.createVideo = this.createVideo.bind(this);
-    this.removeVideo = this.removeVideo.bind(this);
+
+    this.movieInformation = this.movieInformation.bind(this);
+    this.playVideo = this.playVideo.bind(this);
+    this.videoPlayer = this.videoPlayer.bind(this);
   }
 
   handleChange(event) {
@@ -44,20 +46,18 @@ class VideoPlayer extends React.Component {
   }
 
   movieInfo(movieName) {
-    this.removeVideo();
-
     let movieInfo = document.createElement('div');
     movieInfo.setAttribute('id', 'movie-information');
   
     let img = document.createElement('img');
     img.setAttribute('id', 'movie-poster');
-    img.setAttribute('onClick', this.videoConstructor);
+    img.setAttribute('onClick', this.playVideo);
   
     movieInfo.appendChild(img);
     document.body.appendChild(movieInfo);
 
-    // const api_url = 'http://mhzsys.net:21010/api'; // remote
-    const api_url = 'http://192.168.1.10:3000/api'; //local
+    const api_url = 'http://mhzsys.net:21010/api'; // remote
+    //const api_url = 'http://192.168.1.10:3000/api'; //local
     const images_uri = 'http://image.tmdb.org/t/p'
     const img_size = '/w500'
 
@@ -94,37 +94,26 @@ class VideoPlayer extends React.Component {
     console.log('state path: ', this.state.moviePath);
   }
 
-  videoConstructor() {
-    let info = document.getElementById("movie-information");
-    info.parentNode.removeChild(info); // removes video information
-    // info.style.display === 'none';
-
-    this.createVideo(this.state.moviePath, this.state.movieFileName);
+  movieInformation() {
+    return <div id="movie-information">
+        <img id="movie-poster" onClick={this.playVideo}></img>
+    </div>
   }
 
-  createVideo(videoFile) {
-    // this.removeVideo();
+  playVideo() {
+    console.log('playing video');
+    this.setState({isPlaying: true});
+  }
 
-    let url = videoFile;
+  videoPlayer() {
+    let url = this.state.moviePath;
     let height = 720; //9
     let width = (height * 16) / 9; //16
-    let video = document.createElement('video');
-    video.setAttribute('id', 'video-player');
-    video.setAttribute('width', width);
-    video.setAttribute('height', height);
-    video.setAttribute('controls', true);
-  
-    let source = document.createElement('source');
-    source.setAttribute('src', url);
-    source.setAttribute('type', 'video/mp4');
-  
-    video.appendChild(source);
-    document.body.appendChild(video);
-  };
-
-  removeVideo(){
-    var child = document.getElementById("video-player");// removes previously created video
-    child.parentNode.removeChild(child);
+    return <div id="video-player">
+      <video height={height} width={width} controls>
+        <source url={url} type="video/mp4"></source>
+      </video>
+    </div>
   }
 
   render() { // JSX
@@ -139,14 +128,10 @@ class VideoPlayer extends React.Component {
           <input type="file" value={this.state.value} onChange={this.handleChange} />
         </label>
       </form>
-      {/* <div id="movie-information">
-        <img id="movie-poster" onClick={this.videoConstructor}></img>
-      </div> */}
 
-      <div id="video-player"></div>
-      
-
-      </div>;
+      {!this.state.isPlaying && this.movieInformation()}
+      {this.state.isPlaying && this.videoPlayer()}
+    </div>;
   }
 }
 
