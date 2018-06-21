@@ -50,16 +50,24 @@ class VideoPlayer extends React.Component {
       posterUrl: undefined,
     });
 
-    const api_url = 'http://mhzsys.net:21010/api'; // remote
-    //const api_url = 'http://192.168.1.10:3000/api'; //local
+    // const api_url = 'http://mhzsys.net:21010/api'; // remote
+    const api_url = 'http://192.168.1.10:3000/api'; //local
     const images_uri = 'http://image.tmdb.org/t/p'
     const img_size = '/w300'
 
     return $.getJSON(`${api_url}/movies/${movieName}`).then(data => {
       console.log(data[0], 'got search results');
       const posterUrl = `${images_uri}/${img_size}${data[0].poster_path}`;
+      const movieTitle = `${data[0].title}`;
+      const movieDescription = `${data[0].overview}`;
+      const movieReleaseDate = `${data[0].release_date}`;
+      const movieAverage = `${data[0].vote_average}`;
       this.setState({
         posterUrl,
+        movieTitle,
+        movieDescription,
+        movieReleaseDate,
+        movieAverage,
         isError: false,
         isLoading: false,
       })
@@ -80,6 +88,10 @@ class VideoPlayer extends React.Component {
       {!this.state.isLoading && this.state.posterUrl &&
         <img id="movie-poster" onClick={this.playVideo} src={this.state.posterUrl} />
       }
+      {!this.state.isLoading && this.state.movieTitle && <h1>{this.state.movieTitle}</h1>}
+      {!this.state.isLoading && this.state.movieDescription && <p>{this.state.movieDescription}</p>}
+      {!this.state.isLoading && this.state.movieReleaseDate && <p>Release Date: {this.state.movieReleaseDate}</p>}
+      {!this.state.isLoading && this.state.movieAverage && <p>Popularity: {this.state.movieAverage}</p>}
     </div>
   }
 
@@ -89,9 +101,10 @@ class VideoPlayer extends React.Component {
   }
 
   videoPlayer() {
-    let url = this.state.moviePath;
+    // let url = this.state.moviePath;
     let height = 720; //9
     let width = (height * 16) / 9; //16
+    console.log('video location:', this.state.moviePath)
     return <div id="video-player">
       <video height={height} width={width} controls src={this.state.moviePath}>
         Sorry your browser doesn't support video.
