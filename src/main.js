@@ -9,6 +9,9 @@ class VideoPlayer extends React.Component {
     super(props);
     this.state = {}
     this.handleChange = this.handleChange.bind(this);
+    this.movieInfo = this.movieInfo.bind(this);
+    this.setBackground = this.setBackground.bind(this);
+    this.setPoster = this.setPoster.bind(this);
     this.createVideo = this.createVideo.bind(this);
   }
 
@@ -17,8 +20,46 @@ class VideoPlayer extends React.Component {
     // console.log('file name:', fileName);
     let tmppath = URL.createObjectURL(event.target.files[0]);
     // console.log('temp path:', tmppath);
+    var movieName = fileName.split('(');  //remove extra data not related to movie name
+    console.log(movieName);
 
-    this.createVideo(tmppath, fileName);
+    this.movieInfo(movieName[0]);
+    // this.createVideo(tmppath, fileName);
+  }
+
+  movieInfo(movieName) {
+    const api_url = 'http://mhzsys.net:21010/api'; // remote
+    const images_uri = 'http://image.tmdb.org/t/p'
+    const img_size = '/w500'
+
+      return $.getJSON(`${api_url}/movies/${movieName}`).then(data => {
+        console.log(data[0], 'got search results');
+        // console.log(images_uri + img_size + data[0].backdrop_path);
+        // document.body.style.backgroundImage = `"url('${images_uri + img_size + data[0].backdrop_path}')"`;
+        // document.body.style.backgroundImage = "url('http://image.tmdb.org/t/p/w500/gBmrsugfWpiXRh13Vo3j0WW55qD.jpg')";
+        // const bgImage = document.body.style.backgroundImage = `"url('${images_uri}${img_size}${data[0].backdrop_path}')"`;
+        // console.log(bgImage);
+        
+        // this.setBackground(images_uri + img_size + data[0].backdrop_path);
+        // this.setBackground(`${images_uri}${img_size}${data[0].backdrop_path}`);
+        this.setPoster(`${images_uri}/w300${data[0].poster_path}`);
+      }).catch(err => console.error(err));
+  }
+
+  setBackground(bgUrl){
+    console.log('BG setting:', bgUrl);
+    this.setState(document.body.style.backgroundImage = `"url('${bgUrl}')"`);
+    // document.body.style.backgroundImage = "url('http://image.tmdb.org/t/p/w500/gBmrsugfWpiXRh13Vo3j0WW55qD.jpg')";
+    // document.getElementById("body").style.backgroundImage = `"url('${bgUrl}')"`;
+    // document.getElementById("body").style.backgroundImage = "url('http://image.tmdb.org/t/p/w500/gBmrsugfWpiXRh13Vo3j0WW55qD.jpg')";
+  }
+
+  setPoster(posterUrl){
+    console.log('Poster Setting:', posterUrl);
+    let poster = document.getElementById("movie-poster");
+    poster.setAttribute('src', posterUrl);
+    poster.setAttribute('width', 300);
+    // poster.setAttribute('height', );
   }
 
   createVideo(videoFile) {
@@ -43,15 +84,21 @@ class VideoPlayer extends React.Component {
   };
 
   render() { // JSX
-    return <div>
+    return <div id="body">
       <h1>Video Player</h1>
       <p>Choose a local video video file to play in web browser.</p>
+      <p>to increase sucess of finding proper movie information ensure the movies file name is spelled correctly.</p>
+      <p>Example: Jurassic World Fallen Kingdom (2018).mp4</p>
+
       <form onSubmit={this.handleSubmit}>
         <label>
           <input type="file" value={this.state.value} onChange={this.handleChange} />
         </label>
       </form>
+
       <div id="video-player"></div>
+      <img id="movie-poster" onClick={this.createVideo}></img>
+
       </div>;
   }
 }
