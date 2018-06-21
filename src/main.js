@@ -7,24 +7,41 @@ import './style/main.css'
 class VideoPlayer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      movieFileName: '',
+      moviePath: ''
+    }
     this.handleChange = this.handleChange.bind(this);
     this.movieInfo = this.movieInfo.bind(this);
     this.setBackground = this.setBackground.bind(this);
     this.setPoster = this.setPoster.bind(this);
+    this.videoConstructor = this.videoConstructor.bind(this);
     this.createVideo = this.createVideo.bind(this);
   }
 
   handleChange(event) {
     let fileName = event.target.files[0].name;
     // console.log('file name:', fileName);
+    this.setState({
+      movieFileName: event.target.files[0].name
+    });
+
     let tmppath = URL.createObjectURL(event.target.files[0]);
     // console.log('temp path:', tmppath);
+    this.setState({
+      moviePath: URL.createObjectURL(event.target.files[0])
+    });
+
     var movieName = fileName.split('(');  //remove extra data not related to movie name
     console.log(movieName);
 
     this.movieInfo(movieName[0]);
     // this.createVideo(tmppath, fileName);
+
+    let movieInfo = document.createElement('div');
+    movieInfo.setAttribute('id', 'movie-information');
+
+    document.body.appendChild(movieInfo);
   }
 
   movieInfo(movieName) {
@@ -45,6 +62,7 @@ class VideoPlayer extends React.Component {
         // this.setBackground(`${images_uri}${img_size}${data[0].backdrop_path}`);
         this.setPoster(`${images_uri}/w300${data[0].poster_path}`);
       }).catch(err => console.error(err));
+      
   }
 
   setBackground(bgUrl){
@@ -61,6 +79,15 @@ class VideoPlayer extends React.Component {
     poster.setAttribute('src', posterUrl);
     poster.setAttribute('width', 300);
     // poster.setAttribute('height', );
+    console.log('state name: ', this.state.movieFileName);
+    console.log('state path: ', this.state.moviePath);
+  }
+
+  videoConstructor() {
+    var child = document.getElementById("movie-information");
+    child.parentNode.removeChild(child);
+
+    this.createVideo(this.state.moviePath, this.state.movieFileName);
   }
 
   createVideo(videoFile) {
@@ -96,9 +123,12 @@ class VideoPlayer extends React.Component {
           <input type="file" value={this.state.value} onChange={this.handleChange} />
         </label>
       </form>
+      <div id="movie-information">
+        <img id="movie-poster" onClick={this.videoConstructor}></img>
+      </div>
 
       <div id="video-player"></div>
-      <img id="movie-poster" onClick={this.createVideo}></img>
+      
 
       </div>;
   }
