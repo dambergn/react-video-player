@@ -10,12 +10,13 @@ class VideoPlayer extends React.Component {
     this.state = {
       movieFileName: '',
       moviePath: '',
+      // are we searching for a video?
+      isLoading: false,
+      // have we switched from viewing the poster to viewing the movie?
       isPlaying: false,
     }
     this.handleChange = this.handleChange.bind(this);
-    this.movieInfo = this.movieInfo.bind(this);
-    this.setBackground = this.setBackground.bind(this);
-    this.setPoster = this.setPoster.bind(this);
+    this.fetchMovieInfo = this.fetchMovieInfo.bind(this);
 
     this.movieInformation = this.movieInformation.bind(this);
     this.playVideo = this.playVideo.bind(this);
@@ -29,74 +30,56 @@ class VideoPlayer extends React.Component {
       movieFileName: event.target.files[0].name
     });
 
-    let tmppath = URL.createObjectURL(event.target.files[0]);
     // console.log('temp path:', tmppath);
+    let tmppath = URL.createObjectURL(event.target.files[0]);
     this.setState({
-      moviePath: URL.createObjectURL(event.target.files[0])
+      moviePath: tmppath,
     });
 
     var movieName = fileName.split('(');  //remove extra data not related to movie name
     console.log(movieName);
 
-    this.movieInfo(movieName[0]);
-
-    // let info = document.getElementById("movie-information");
-    // info.style.display === 'none';
-
+    this.fetchMovieInfo(movieName[0]);
   }
 
-  movieInfo(movieName) {
-    let movieInfo = document.createElement('div');
-    movieInfo.setAttribute('id', 'movie-information');
-  
-    let img = document.createElement('img');
-    img.setAttribute('id', 'movie-poster');
-    img.setAttribute('onClick', this.playVideo);
-  
-    movieInfo.appendChild(img);
-    document.body.appendChild(movieInfo);
+  fetchMovieInfo(movieName) {
+    // reset the state of everything when starting a new search.
+    this.setState({
+      isError: false,
+      isLoading: true,
+      posterUrl: undefined,
+    });
 
     const api_url = 'http://mhzsys.net:21010/api'; // remote
     //const api_url = 'http://192.168.1.10:3000/api'; //local
     const images_uri = 'http://image.tmdb.org/t/p'
-    const img_size = '/w500'
+    const img_size = '/w300'
 
-      return $.getJSON(`${api_url}/movies/${movieName}`).then(data => {
-        console.log(data[0], 'got search results');
-        // console.log(images_uri + img_size + data[0].backdrop_path);
-        // document.body.style.backgroundImage = `"url('${images_uri + img_size + data[0].backdrop_path}')"`;
-        // document.body.style.backgroundImage = "url('http://image.tmdb.org/t/p/w500/gBmrsugfWpiXRh13Vo3j0WW55qD.jpg')";
-        // const bgImage = document.body.style.backgroundImage = `"url('${images_uri}${img_size}${data[0].backdrop_path}')"`;
-        // console.log(bgImage);
-        
-        // this.setBackground(images_uri + img_size + data[0].backdrop_path);
-        // this.setBackground(`${images_uri}${img_size}${data[0].backdrop_path}`);
-        this.setPoster(`${images_uri}/w300${data[0].poster_path}`);
-      }).catch(err => console.error(err));
+    return $.getJSON(`${api_url}/movies/${movieName}`).then(data => {
+      console.log(data[0], 'got search results');
+      const posterUrl = `${images_uri}/${img_size}${data[0].poster_path}`;
+      this.setState({
+        posterUrl,
+        isError: false,
+        isLoading: false,
+      })
+    }).catch(err => {
+      console.error(err)
+      this.setState({
+        isError: true,
+        isLoading: false,
+      });
+    });
       
-  }
-
-  setBackground(bgUrl){
-    console.log('BG setting:', bgUrl);
-    this.setState(document.body.style.backgroundImage = `"url('${bgUrl}')"`);
-    // document.body.style.backgroundImage = "url('http://image.tmdb.org/t/p/w500/gBmrsugfWpiXRh13Vo3j0WW55qD.jpg')";
-    // document.getElementById("body").style.backgroundImage = `"url('${bgUrl}')"`;
-    // document.getElementById("body").style.backgroundImage = "url('http://image.tmdb.org/t/p/w500/gBmrsugfWpiXRh13Vo3j0WW55qD.jpg')";
-  }
-
-  setPoster(posterUrl){
-    console.log('Poster Setting:', posterUrl);
-    let poster = document.getElementById("movie-poster");
-    poster.setAttribute('src', posterUrl);
-    poster.setAttribute('width', 300);
-    // poster.setAttribute('height', );
-    console.log('state name: ', this.state.movieFileName);
-    console.log('state path: ', this.state.moviePath);
   }
 
   movieInformation() {
     return <div id="movie-information">
-        <img id="movie-poster" onClick={this.playVideo}></img>
+      {this.state.isLoading && <p>Loading poster...</p>}
+      {!this.state.isLoading && this.state.isError && <p>Couldn't find movie poster.</p>}
+      {!this.state.isLoading && this.state.posterUrl &&
+        <img id="movie-poster" onClick={this.playVideo} src={this.state.posterUrl} />
+      }
     </div>
   }
 
@@ -110,8 +93,8 @@ class VideoPlayer extends React.Component {
     let height = 720; //9
     let width = (height * 16) / 9; //16
     return <div id="video-player">
-      <video height={height} width={width} controls>
-        <source url={url} type="video/mp4"></source>
+      <video height={height} width={width} controls src={this.state.moviePath}>
+        Sorry your browser doesn't support video.
       </video>
     </div>
   }
