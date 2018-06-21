@@ -30,10 +30,10 @@ class VideoPlayer extends React.Component {
       movieFileName: event.target.files[0].name
     });
 
-    let tmppath = URL.createObjectURL(event.target.files[0]);
     // console.log('temp path:', tmppath);
+    let tmppath = URL.createObjectURL(event.target.files[0]);
     this.setState({
-      moviePath: URL.createObjectURL(event.target.files[0])
+      moviePath: tmppath,
     });
 
     var movieName = fileName.split('(');  //remove extra data not related to movie name
@@ -93,8 +93,8 @@ class VideoPlayer extends React.Component {
     let height = 720; //9
     let width = (height * 16) / 9; //16
     return <div id="video-player">
-      <video height={height} width={width} controls>
-        <source url={url} type="video/mp4"></source>
+      <video height={height} width={width} controls src={this.state.moviePath}>
+        Sorry your browser doesn't support video.
       </video>
     </div>
   }
