@@ -28,7 +28,8 @@ class VideoPlayer extends React.Component {
   }
 
   movieInfo(movieName) {
-    const api_url = 'http://mhzsys.net:21010/api'; // remote
+    // const api_url = 'http://mhzsys.net:21010/api'; // remote
+    const api_url = 'http://192.168.1.10:3000/api'; //local
     const images_uri = 'http://image.tmdb.org/t/p'
     const img_size = '/w500'
 
